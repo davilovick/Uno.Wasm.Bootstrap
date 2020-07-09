@@ -13,7 +13,7 @@ mono --version
 echo Validating MSBuild Version
 msbuild /version
 
-export UNO_EMSDK_PATH=`wslpath "$UNO_INTERMEDIATE_PATH"`/emsdk-$UNO_EMSDK_VERSION
+export UNO_EMSDK_PATH=$UNO_INTERMEDIATE_PATH/emsdk-$UNO_EMSDK_VERSION
 
 echo "UNO_EMSDK_PATH: $UNO_EMSDK_PATH"
 

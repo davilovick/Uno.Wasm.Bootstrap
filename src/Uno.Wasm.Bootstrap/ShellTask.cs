@@ -611,7 +611,7 @@ namespace Uno.Wasm.Bootstrap
 					_ => throw new NotSupportedException($"Mode {_runtimeExecutionMode} is not supported"),
 				};
 
-				var aotOptions = $"{aotMode} {dynamicLibraryParams} {bitcodeFilesParams} --emscripten-sdkdir=\"{AlignPath(emsdkPath)}\" --builddir=\"{AlignPath(workAotPath)}\"";
+				var aotOptions = $"{aotMode} {dynamicLibraryParams} {bitcodeFilesParams} --emscripten-sdkdir=\"{emsdkPath}\" --builddir=\"{AlignPath(workAotPath)}\"";
 
 				if (EnableEmccProfiling)
 				{
@@ -798,7 +798,7 @@ namespace Uno.Wasm.Bootstrap
 			if (Environment.OSVersion.Platform == PlatformID.Win32NT)
 			{
 				var emsdkHostFolder = Environment.GetEnvironmentVariable("WASMSHELL_EMSDK") ?? BaseIntermediateOutputPath;
-				var emsdkBaseFolder = emsdkHostFolder + $"\\emsdk-{Constants.EmscriptenMinVersion}";
+				var emsdkBaseFolder = emsdkHostFolder + $"/emsdk-{Constants.EmscriptenMinVersion}";
 
 				if (!File.Exists(Environment.GetEnvironmentVariable("WINDIR") + "\\sysnative\\bash.exe"))
 				{
@@ -807,25 +807,27 @@ namespace Uno.Wasm.Bootstrap
 
 				// Enable compression for the emsdk folder
 				var emsdkBaseFolderRaw = emsdkBaseFolder.Replace(@"\\?\", "");
-				if (!Directory.Exists(emsdkBaseFolderRaw))
-				{
-					Log.LogMessage($"Creating {emsdkBaseFolder}");
-					Directory.CreateDirectory(emsdkBaseFolderRaw);
-					Process.Start("compact", $"/c \"/s:{emsdkBaseFolder}\"");
-				}
+				//if (!Directory.Exists(emsdkBaseFolderRaw))
+				//{
+				//	Log.LogMessage($"Creating {emsdkBaseFolder}");
+				//	Directory.CreateDirectory(emsdkBaseFolderRaw);
+				//	Process.Start("compact", $"/c \"/s:{emsdkBaseFolder}\"");
+				//}
 
 				var emscriptenSetupScript = Path.Combine(BuildTaskBasePath, "scripts", "emscripten-setup.sh");
 
 				// Adjust line endings
 				AdjustFileLineEndings(emscriptenSetupScript);
 
+				var parameters = $"\"{emsdkHostFolder}\" {Constants.EmscriptenMinVersion}";
 				var result = RunProcess(
 					emscriptenSetupScript,
-					$"\"{emsdkHostFolder.Replace("\\\\?\\", "").TrimEnd('\\')}\" {Constants.EmscriptenMinVersion}");
+					parameters
+					);
 
 				if (result.exitCode == 0)
 				{
-					return emsdkBaseFolder + $"\\emsdk";
+					return emsdkBaseFolder + $"/emsdk";
 				}
 
 				var dotnetSetupScript = Path.Combine(BuildTaskBasePath, "scripts", "dotnet-setup.sh");
